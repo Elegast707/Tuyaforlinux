@@ -138,9 +138,11 @@ def friendly_error(message: str) -> str:
     """Turn a technical TinyTuya error into something a human understands."""
     text = str(message).lower()
     if any(word in text for word in ("timeout", "unreachable", "unable to connect",
-                                     "unable to find", "not configured", "network error",
+                                     "unable to find", "network error",
                                      "timed out", "connection refused", "no route")):
         return UNREACHABLE_MESSAGE
+    if "not configured" in text:
+        return "the lamp did not report its state (is it a supported Tuya light?)"
     if "key or version" in text:
         return "wrong local key or protocol version (re-run the TinyTuya wizard)"
     if "not supported" in text:
@@ -196,6 +198,16 @@ def read_state(device) -> dict:
     has_colourtemp. Raises LampError on failure.
     """
     try:
+        if not device.bulb_configured:
+            # Ask for the raw status first. Without this, TinyTuya hides the
+            # real problem (timeout, wrong key, ...) behind a generic
+            # "Bulb not configured" error.
+            status = check(device.status())
+            if not device.bulb_configured:
+                points = ", ".join(sorted(status.get("dps", {}), key=lambda dp: int(dp)
+                                          if str(dp).isdigit() else 0))
+                raise LampError("unknown lamp type: TinyTuya cannot find the light "
+                                f"data points (the lamp reported: {points or 'none'})")
         state = check(device.state())
         has_colour = device.bulb_has_capability("colour")
         has_colourtemp = device.bulb_has_capability("colourtemp")
@@ -429,13 +441,29 @@ def cmd_set(args) -> int:
 # also works without PySide6 installed.
 
 def run_gui() -> int:
-    from PySide6.QtCore import QObject, Qt, QTimer, Signal
-    from PySide6.QtGui import QColor, QPalette
-    from PySide6.QtWidgets import (
-        QApplication, QButtonGroup, QCheckBox, QColorDialog, QFrame, QGridLayout,
-        QHBoxLayout, QLabel, QMainWindow, QMessageBox, QPushButton, QScrollArea,
-        QSizePolicy, QSlider, QVBoxLayout, QWidget,
-    )
+    try:
+        from PySide6.QtCore import QObject, Qt, QTimer, Signal
+        from PySide6.QtGui import QColor, QPalette
+        from PySide6.QtWidgets import (
+            QApplication, QButtonGroup, QCheckBox, QColorDialog, QFrame, QGridLayout,
+            QHBoxLayout, QLabel, QMainWindow, QMessageBox, QPushButton, QScrollArea,
+            QSizePolicy, QSlider, QVBoxLayout, QWidget,
+        )
+    except ImportError as error:
+        # PySide6 is missing, or Qt needs a system library that isn't installed.
+        print(f"Cannot start the desktop app: {error}", file=sys.stderr)
+        library = getattr(error, "name", None) or str(error)
+        if "libgthread" in library:
+            print("On openSUSE, install the missing library with:\n"
+                  "    sudo zypper install libgthread-2_0-0", file=sys.stderr)
+        elif ".so" in library:
+            print("A system library needed by Qt is missing. Install the package that "
+                  "provides it (openSUSE: 'zypper se --provides <library name>').",
+                  file=sys.stderr)
+        else:
+            print("Reinstall Tuya Lamps with ./install.sh to install PySide6.", file=sys.stderr)
+        print("The command line (tuya-lamps list / set) works without Qt.", file=sys.stderr)
+        return 1
 
     # --- Background worker ---------------------------------------------------
 

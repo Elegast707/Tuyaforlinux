@@ -58,6 +58,20 @@ fi
 "$VENV_DIR/bin/python" -m pip install --upgrade --quiet pip
 "$VENV_DIR/bin/python" -m pip install --upgrade --quiet -r "$SCRIPT_DIR/requirements.txt"
 
+# PySide6 bundles Qt, but Qt still needs a few system libraries.
+# Check now, so a missing library is reported here instead of the app
+# silently not starting from the menu.
+if ! qt_error="$("$VENV_DIR/bin/python" -c "import PySide6.QtWidgets" 2>&1)"; then
+    echo
+    echo "WARNING: the desktop app cannot load Qt yet:"
+    echo "  ${qt_error##*$'\n'}"
+    case "$qt_error" in
+        *libgthread*) echo "Fix it with:  sudo zypper install libgthread-2_0-0" ;;
+        *) echo "Install the system package that provides the missing library." ;;
+    esac
+    echo "The CLI and the Plasma widget work without it."
+fi
+
 step "Copying the app to $APP_DIR"
 install -m 644 "$SCRIPT_DIR/tuya_lamps.py" "$APP_DIR/tuya_lamps.py"
 install -m 644 "$SCRIPT_DIR/requirements.txt" "$APP_DIR/requirements.txt"

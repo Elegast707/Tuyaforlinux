@@ -236,6 +236,17 @@ plasmoidviewer -a io.github.elegast707.tuyalamps
 
 ## Troubleshooting
 
+**The desktop app does not open (`libgthread-2.0.so.0: cannot open shared object file`)**
+PySide6 brings its own Qt, but Qt still needs this small GLib library, which
+openSUSE Tumbleweed doesn't always install. Install it:
+
+```bash
+sudo zypper install libgthread-2_0-0
+```
+
+Run `tuya-lamps` in a terminal to see why the app doesn't start. The CLI and
+the Plasma widget work without Qt.
+
 **A lamp shows a red dot / "unreachable"**
 - Is the lamp powered (wall switch on) and connected to Wi-Fi? Check it in the
   Smart Life app.

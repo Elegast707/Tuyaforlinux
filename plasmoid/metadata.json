@@ -1,0 +1,19 @@
+{
+    "KPlugin": {
+        "Authors": [
+            {
+                "Name": "Daniël Veen"
+            }
+        ],
+        "Category": "Utilities",
+        "Description": "Control your Tuya Wi-Fi lamps locally over the LAN",
+        "Icon": "lightbulb",
+        "Id": "io.github.elegast707.tuyalamps",
+        "License": "GPL-3.0",
+        "Name": "Tuya Lamps",
+        "Version": "1.0.0",
+        "Website": "https://github.com/elegast707/tuyaforlinux"
+    },
+    "KPackageStructure": "Plasma/Applet",
+    "X-Plasma-API-Minimum-Version": "6.0"
+}

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Settings of the Tuya Lamps widget. Plasma stores them per widget instance. -->
+<kcfg xmlns="http://www.kde.org/standards/kcfg/1.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.kde.org/standards/kcfg/1.0
+                          http://www.kde.org/standards/kcfg/1.0/kcfg.xsd">
+  <kcfgfile name=""/>
+  <group name="General">
+    <entry name="commandPath" type="String">
+      <label>Command used to talk to the lamps</label>
+      <default>tuya-lamps</default>
+    </entry>
+    <entry name="refreshInterval" type="Int">
+      <label>Seconds between refreshes while the popup is open</label>
+      <default>30</default>
+      <min>5</min>
+      <max>600</max>
+    </entry>
+  </group>
+</kcfg>

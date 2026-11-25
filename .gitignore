@@ -1,0 +1,17 @@
+# --- Secrets: NEVER commit these -------------------------------------------
+# Files created by "python -m tinytuya wizard" contain the local keys of your
+# lamps and your Tuya IoT API secret.
+devices.json
+devices.json.*
+snapshot.json
+tinytuya.json
+tuya-raw.json
+
+# --- Python ------------------------------------------------------------------
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# --- QML cache ---------------------------------------------------------------
+*.qmlc

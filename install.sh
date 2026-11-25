@@ -20,6 +20,7 @@ VENV_DIR="$APP_DIR/venv"
 BIN_DIR="$HOME/.local/bin"
 LAUNCHER="$BIN_DIR/tuya-lamps"
 DESKTOP_DIR="$HOME/.local/share/applications"
+ICON_DIR="$HOME/.local/share/icons/hicolor/scalable/apps"
 CONFIG_DIR="$HOME/.config/tuya-lamps"
 PLASMOID_ID="io.github.elegast707.tuyalamps"
 
@@ -75,6 +76,7 @@ fi
 step "Copying the app to $APP_DIR"
 install -m 644 "$SCRIPT_DIR/tuya_lamps.py" "$APP_DIR/tuya_lamps.py"
 install -m 644 "$SCRIPT_DIR/requirements.txt" "$APP_DIR/requirements.txt"
+install -m 644 "$SCRIPT_DIR/icons/tuya-lamps.svg" "$APP_DIR/tuya-lamps.svg"
 
 # --- Launcher ------------------------------------------------------------------
 
@@ -90,8 +92,14 @@ chmod 755 "$LAUNCHER"
 
 # --- Desktop file ----------------------------------------------------------------
 
-step "Installing the menu entry"
-mkdir -p "$DESKTOP_DIR"
+step "Installing the menu entry and icon"
+mkdir -p "$DESKTOP_DIR" "$ICON_DIR"
+install -m 644 "$SCRIPT_DIR/icons/tuya-lamps.svg" "$ICON_DIR/tuya-lamps.svg"
+# Tell the desktop that the icon folder changed (harmless if the tool is missing).
+touch "$HOME/.local/share/icons/hicolor"
+if command -v gtk-update-icon-cache >/dev/null 2>&1; then
+    gtk-update-icon-cache -q -t -f "$HOME/.local/share/icons/hicolor" 2>/dev/null || true
+fi
 # Use the full launcher path: the desktop session's PATH may not include ~/.local/bin.
 sed "s|^Exec=.*|Exec=$LAUNCHER|" "$SCRIPT_DIR/tuya-lamps.desktop" > "$DESKTOP_DIR/tuya-lamps.desktop"
 chmod 644 "$DESKTOP_DIR/tuya-lamps.desktop"

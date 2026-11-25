@@ -255,6 +255,15 @@ the Plasma widget work without Qt.
 - The lamp's IP address may have changed. Run the wizard again and answer yes
   to polling, or give the lamp a fixed IP address in your router.
 
+**"not found on the network", while the lamp works in the Smart Life app**
+A lamp that was removed and added again in the app gets a **new device ID**
+(and a new local key), so `devices.json` no longer matches it. Run the wizard
+again. You can compare the IDs with a scan from the config folder:
+
+```bash
+cd ~/.config/tuya-lamps && ~/.local/share/tuya-lamps/venv/bin/python -m tinytuya scan
+```
+
 **"wrong local key or protocol version"**
 A lamp that was removed and paired again in the Smart Life app gets a **new
 local key**. Run the wizard again (see [One-time setup](#one-time-setup-getting-the-local-keys)).

@@ -10,6 +10,7 @@ set -euo pipefail
 APP_DIR="$HOME/.local/share/tuya-lamps"
 LAUNCHER="$HOME/.local/bin/tuya-lamps"
 DESKTOP_FILE="$HOME/.local/share/applications/tuya-lamps.desktop"
+ICON_FILE="$HOME/.local/share/icons/hicolor/scalable/apps/tuya-lamps.svg"
 CONFIG_DIR="$HOME/.config/tuya-lamps"
 PLASMOID_ID="io.github.elegast707.tuyalamps"
 
@@ -22,6 +23,7 @@ remove() {
 
 remove "$LAUNCHER"
 remove "$DESKTOP_FILE"
+remove "$ICON_FILE"
 remove "$APP_DIR"
 
 if command -v update-desktop-database >/dev/null 2>&1; then

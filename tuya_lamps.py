@@ -41,6 +41,9 @@ SOCKET_TIMEOUT = 3      # seconds to wait for an answer
 SOCKET_RETRY_LIMIT = 1  # how often to retry a failed connection
 
 UNREACHABLE_MESSAGE = "unreachable (is the lamp powered and on the same network?)"
+NOT_FOUND_MESSAGE = ("not found on the network. If it works in the Smart Life app, it was "
+                     "probably paired again and got a new device ID and key: re-run the "
+                     "TinyTuya wizard")
 
 
 # ===========================================================================
@@ -180,7 +183,11 @@ def make_device(lamp: LampConfig, persistent: bool = False):
             device = tinytuya.BulbDevice(lamp.id, lamp.ip, lamp.key, version=version)
         else:
             device = tinytuya.BulbDevice(lamp.id, "Auto", lamp.key)
-    except Exception as error:  # e.g. "Unable to find device on network"
+    except Exception as error:
+        # Without an IP address TinyTuya listens for the lamp's broadcast.
+        # If no lamp with this device ID answers, the ID is probably outdated.
+        if "unable to find device" in str(error).lower():
+            raise LampError(NOT_FOUND_MESSAGE) from error
         raise LampError(friendly_error(error)) from error
 
     device.set_socketTimeout(SOCKET_TIMEOUT)
@@ -440,10 +447,22 @@ def cmd_set(args) -> int:
 # PySide6 is imported here (not at the top) so the CLI starts quickly and
 # also works without PySide6 installed.
 
+def app_icon(icon_class):
+    """
+    The window icon: "tuya-lamps" from the icon theme (installed by
+    install.sh), or the SVG next to this file / in the repo's icons folder.
+    """
+    here = Path(__file__).resolve().parent
+    for candidate in (here / "tuya-lamps.svg", here / "icons" / "tuya-lamps.svg"):
+        if candidate.exists():
+            return icon_class.fromTheme("tuya-lamps", icon_class(str(candidate)))
+    return icon_class.fromTheme("tuya-lamps", icon_class.fromTheme("lightbulb"))
+
+
 def run_gui() -> int:
     try:
         from PySide6.QtCore import QObject, Qt, QTimer, Signal
-        from PySide6.QtGui import QColor, QPalette
+        from PySide6.QtGui import QColor, QIcon, QPalette
         from PySide6.QtWidgets import (
             QApplication, QButtonGroup, QCheckBox, QColorDialog, QFrame, QGridLayout,
             QHBoxLayout, QLabel, QMainWindow, QMessageBox, QPushButton, QScrollArea,
@@ -937,6 +956,7 @@ def run_gui() -> int:
     app = QApplication.instance() or QApplication(sys.argv)
     app.setApplicationName(APP_NAME)
     app.setDesktopFileName("tuya-lamps")  # lets Wayland match our .desktop file
+    app.setWindowIcon(app_icon(QIcon))
     apply_theme(app)
 
     try:

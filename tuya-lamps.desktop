@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=Tuya Lamps
+GenericName=Smart Lamp Control
+Comment=Control your Tuya Wi-Fi lamps locally over the LAN
+Exec=tuya-lamps
+Icon=lightbulb
+Terminal=false
+Categories=Utility;
+Keywords=tuya;smart;lamp;light;bulb;led;
+StartupNotify=true
+StartupWMClass=tuya-lamps

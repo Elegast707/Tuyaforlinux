@@ -12,7 +12,7 @@ This single file contains three layers:
 
 Run ``tuya-lamps --help`` for usage.
 
-License: GPL-3.0-or-later (see the LICENSE file).
+License: GPL-3.0 (see the LICENSE file).
 """
 
 from __future__ import annotations

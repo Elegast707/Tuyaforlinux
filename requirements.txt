@@ -1,0 +1,3 @@
+# Python packages for Tuya Lamps. install.sh installs these into a venv.
+tinytuya>=1.17
+PySide6>=6.5
